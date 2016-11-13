@@ -29,16 +29,26 @@ class AbstractState(object):
         return value
 
     def zero(self, value):
-        pass
+        """
+        Correct resting values.
+        """
 
     def process_event(self, event):
+        """
+        Handle an event from sdl2.
+        """
         raise NotImplemented()
 
     def value(self):
+        """
+        The current value of the component.
+        """
         raise NotImplemented()
 
     def clear(self):
-        pass
+        """
+        Reset the value.
+        """
 
 
 class CurrentButtonState(AbstractState):
@@ -158,7 +168,7 @@ class PulledTriggerState(DecimalTriggerState):
 
 class DPadState(AbstractState):
     """
-    State of the dpad as the current position as a combo of 'u' or 'd' and  'r' or 'l'
+    State of the dpad as the current position as a string of letters
 
     # Examples
 
@@ -169,7 +179,7 @@ class DPadState(AbstractState):
     def __init__(self):
         self.__value = 0
 
-    def process_event(self, event: HatEvent):
+    def process_event(self, event: DPadEvent):
         self.__value = event.state
 
     def value(self):
@@ -191,7 +201,7 @@ class DPadState(AbstractState):
         return result
 
 
-class DPadSwitchesState(HatState):
+class DPadSwitchesState(DPadState):
     """
     State as a tuple of pressed cardinal directions.
     """
@@ -220,8 +230,8 @@ class Controller(object):
     Controller.init()
     controller = Controller(0)
 
-    controller.a = ToggleButtonState() # Make A a toggle button instead of the default
-                                       # current state button.
+    controller.a = ToggleButtonState() # Make A a toggle button instead of
+                                       # the default current state button.
 
     while True:
         controller.update() # Poll for changes.
@@ -300,4 +310,5 @@ class Controller(object):
                 axis_array[event.jaxis.axis].process_event(
                     AxisEvent(event.jaxis.timestamp, event.jaxis.value))
             elif event.type == sdl2.SDL_JOYHATMOTION:
-                self.dpad.process_event(DPadEvent(event.jhat.timestamp, event.jhat.value))
+                self.dpad.process_event(
+                    DPadEvent(event.jhat.timestamp, event.jhat.value))
